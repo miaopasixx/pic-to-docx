@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>活动图片转docx工具</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* 更换字体 */
+            max-width: 600px; /* 调整整体宽度 */
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f4f8; /* 更改背景颜色 */
+        }
+        .container {
+            background-color: white;
+            padding: 20px; /* 保持内边距 */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2); /* 增加阴影效果 */
+            margin-bottom: 20px; /* 增加底部间距 */
+            margin: 0 20px; /* 设置左右边距一致 */
+        }
+        h1 {
+            text-align: center;
+            color: #333; /* 标题颜色 */
+            margin-bottom: 20px; /* 增加标题下边距 */
+        }
+        .form-group {
+            margin-bottom: 20px; /* 增加间距 */
+        }
+        label {
+            display: block;
+            margin-bottom: 8px; /* 增加标签下边距 */
+            font-weight: bold;
+            color: #555; /* 标签颜色 */
+        }
+        input[type="text"] {
+            width: 90%; /* 设置宽度为100% */
+            margin: 0 auto; /* 水平居中 */
+            padding: 10px; /* 增加内边距 */
+            margin-bottom: 12px; /* 增加下边距 */
+            border: 1px solid #ccc; /* 边框颜色 */
+            border-radius: 6px; /* 增加圆角 */
+            transition: border-color 0.3s; /* 增加过渡效果 */
+            display: block; /* 使其为块级元素 */
+        }
+        input[type="text"]:focus {
+            border-color: #4CAF50; /* 聚焦时边框颜色 */
+        }
+        input[type="file"] {
+            display: none; /* 隐藏默认的文件输入框 */
+        }
+        .custom-file-upload {
+            width: 90%; /* 设置宽度为100% */
+            margin: 0 auto; /* 水平居中 */
+            margin-bottom: 12px; /* 增加下边距 */
+            padding: 10px; /* 增加内边距 */
+            border: 1px solid #ccc; /* 边框颜色 */
+            border-radius: 6px; /* 圆角 */
+            background-color: #f8f9fa; /* 背景颜色 */
+            color: #333; /* 字体颜色 */
+            cursor: pointer; /* 鼠标指针样式 */
+            transition: background-color 0.3s; /* 增加过渡效果 */
+        }
+        .custom-file-upload:hover {
+            background-color: #e2e6ea; /* 悬停时背景颜色 */
+        }
+        .preview {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px; /* 增加图片间距 */
+            justify-content: center; /* 图片预览居中 */
+        }
+        .preview img {
+            max-width: 100%; /* 图片最大宽度100% */
+            max-height: 200px; /* 图片最大高度 */
+            object-fit: contain;
+            border: 2px solid #ddd; /* 增加图片边框 */
+            border-radius: 4px; /* 增加圆角 */
+        }
+        button {
+            background-color: #007BFF; /* 按钮颜色 */
+            color: white;
+            padding: 12px 25px; /* 增加内边距 */
+            border: none;
+            border-radius: 6px; /* 增加圆角 */
+            cursor: pointer;
+            font-size: 16px; /* 增加字体大小 */
+            transition: background-color 0.3s; /* 增加过渡效果 */
+            width: 100%; /* 按钮宽度100% */
+        }
+        button:hover {
+            background-color: #0056b3; /* 悬停时按钮颜色 */
+        }
+        .button-group {
+            display: flex;
+            gap: 15px; /* 按钮间距 */
+            margin-top: 25px; /* 增加按钮组上边距 */
+        }
+        .print-preview {
+            width: 520px; /* 设置打印预览区域宽度 */
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ddd; /* 增加边框 */
+            display: none; /* 默认隐藏 */
+        }
+        @media print {
+            .print-preview {
+                width: 100%; /* 设置打印预览区域宽度为100% */
+                transform: scale(2.5); /* 增加缩放比例 */
+                transform-origin: top left; /* 设置缩放原点 */
+                margin: -20mm; /* 负边距以填充整个纸张 */
+            }
+            h2, .button-group {
+                display: none; /* 隐藏打印预览标题和按钮组 */
+            }
+            .print-content-wrapper {
+                border: none !important; /* 确保不显示边框 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper" style="display: flex; justify-content: center; align-items: stretch; width: 100%; max-width: 1100px; margin: 0 auto; gap: 20px;">
+        <!-- 非打印区域 -->
+        <div class="container no-print" style="width: 520px; flex-shrink: 0; flex-grow: 1;">
+            <h1>活动图片转docx工具</h1>
+            <form id="photoForm">
+                <div class="form-group">
+                    <label for="title">标题文字：</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="photo1">第一张照片：</label>
+                    <label class="custom-file-upload">
+                        选择文件
+                        <input type="file" id="photo1" name="photo1" accept="image/*" required>
+                    </label>
+                    <div id="preview1" class="preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="photo2">第二张照片：</label>
+                    <label class="custom-file-upload">
+                        选择文件
+                        <input type="file" id="photo2" name="photo2" accept="image/*" required>
+                    </label>
+                    <div id="preview2" class="preview"></div>
+                </div>
+                <div class="button-group">
+                    <button type="submit">生成文档</button>
+                    <button type="button" class="preview-button" onclick="showPrintPreview()">打印预览</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- 打印预览区域 -->
+        <div id="printPreview" class="print-preview" style="width: 520px; flex-shrink: 0; flex-grow: 1;">
+            <h2>打印预览</h2>
+            <div class="print-content-wrapper" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 20px;">
+                <div id="printContent">
+                    <div class="print-images">
+                        <img id="previewImage" class="print-image" style="width: 100%; height: auto;">
+                    </div>
+                </div>
+            </div>
+            <div class="button-group">
+                <button class="preview-button" onclick="printDocument()">打印</button>
+                <button class="preview-button" onclick="hidePrintPreview()">关闭预览</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(input, previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    preview.appendChild(img);
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('photo1').addEventListener('change', function() {
+            previewImage(this, 'preview1');
+        });
+
+        document.getElementById('photo2').addEventListener('change', function() {
+            previewImage(this, 'preview2');
+        });
+
+        async function showPrintPreview() {
+            const title = document.getElementById('title').value;
+            if (!title) {
+                alert('请输入标题');
+                return;
+            }
+
+            const photo1 = document.getElementById('photo1').files[0];
+            const photo2 = document.getElementById('photo2').files[0];
+            if (!photo1 || !photo2) {
+                alert('请选择两张照片');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('photo1', photo1);
+            formData.append('photo2', photo2);
+
+            try {
+                const response = await fetch('/api/preview', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const previewImage = document.getElementById('previewImage');
+                    
+                    // 设置预览图像
+                    previewImage.src = 'data:image/png;base64,' + data.preview;
+                    
+                    // 显示预览区域
+                    document.getElementById('printPreview').style.display = 'block';
+                } else {
+                    alert('生成预览失败，请重试');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('发生错误，请重试');
+            }
+        }
+
+        function hidePrintPreview() {
+            document.getElementById('printPreview').style.display = 'none';
+        }
+
+        function printDocument() {
+            const title = document.getElementById('title').value;
+            if (!title) {
+                alert('请输入标题');
+                return;
+            }
+
+            // 使用生成文档的内容
+            const printContent = document.getElementById('printPreview').innerHTML; // 获取打印预览内容
+            const originalContent = document.body.innerHTML; // 保存原始内容
+            document.body.innerHTML = printContent; // 只显示打印内容
+
+            window.print(); // 打印
+
+            document.body.innerHTML = originalContent; // 恢复原始内容
+        }
+
+        document.getElementById('photoForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            formData.append('title', document.getElementById('title').value);
+            formData.append('photo1', document.getElementById('photo1').files[0]);
+            formData.append('photo2', document.getElementById('photo2').files[0]);
+
+            try {
+                const response = await fetch('/api/combine-photos', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `照片丨${document.getElementById('title').value}.docx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    a.remove();
+                } else {
+                    alert('生成文档失败，请重试');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('发生错误，请重试');
+            }
+        });
+    </script>
+</body>
+</html>
