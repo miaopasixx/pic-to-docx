@@ -80,8 +80,8 @@ def create_photo_doc(title, img1_path, img2_path, output_path=None):
         
         # 设置标题字体
         try:
-            title_run.font.name = '方正小标宋简体'
-            title_run._element.rPr.rFonts.set(qn('w:eastAsia'), '方正小标宋简体')
+            title_run.font.name = 'FZXB'
+            title_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'FZXB')
         except:
             title_run.font.name = 'SimSun'
             title_run._element.rPr.rFonts.set(qn('w:eastAsia'), 'SimSun')
